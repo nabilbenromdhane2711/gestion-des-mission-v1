@@ -1,1 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des missions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px; /* Augmenté pour les 5 colonnes */
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
 
+        /* --- NOUVELLE STRUCTURE --- */
+        .top-priority-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .main-column {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+        }
+
+        /* Styles des cartes en haut */
+        .top-priority-grid .record-item {
+            flex-direction: column;
+            text-align: center;
+            font-size: 0.9em;
+            padding: 10px;
+            border-bottom: none;
+            border-top: 5px solid;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .top-priority-grid .mission-actions {
+            flex-direction: row;
+            justify-content: center;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        /* --- STYLES EXISTANTS MODIFIÉS --- */
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #addButton {
+            background-color: #4CAF50;
+            color: white;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .archive-btn { background-color: #f44336; color: white; }
+        .edit-btn { background-color: #2196F3; color: white; }
+
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            background-color: #fff;
+            align-items: center;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .priority-high { color: red; font-weight: bold; }
+        .priority-medium { color: orange; }
+        .priority-low { color: green; }
+
+        /* Couleurs bordures */
+        .intervention-remote { border-left: 5px solid #2196F3; }
+        .intervention-onsite { border-left: 5px solid #4CAF50; }
+        .intervention-both { border-left: 5px solid #9c27b0; }
+
+        .mission-details { flex-grow: 1; }
+        .mission-actions { display: flex; gap: 8px; align-items: center; }
+        .problem-details { font-style: italic; color: #555; margin: 3px 0; }
+        .description { 
+            margin: 5px 0; 
+            padding: 5px; 
+            background-color: #f8f9fa; 
+            font-size: 13px; 
+            border-radius: 3px;
+        }
+
+        .priority-controls { display: flex; align-items: center; gap: 5px; }
+        .priority-btn { padding: 2px 5px; background: #eee; }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            z-index: 99;
+            top: 100%; left: 0; right: 0;
+            background: white;
+        }
+        .autocomplete-items div { padding: 10px; cursor: pointer; border-bottom: 1px solid #d4d4d4; }
+
+        .export-container {
+            margin-top: 40px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tableau de bord des missions</h1>
+
+    <div id="topMissionsSection">
+        <h2>🔥 Top 5 Priorités</h2>
+        <div id="topMissionsGrid" class="top-priority-grid">
+            </div>
+    </div>
+
+    <div class="main-column">
+        <h2>Liste des missions</h2>
+        <div id="recordsList">
+            </div>
+    </div>
+
+    <div class="form-container">
+        <h2>Nouvelle Mission</h2>
+        <div class="form-group">
+            <label for="userName">Nom du collaborateur :</label>
+            <input type="text" id="userName" autocomplete="off" required>
+            <div id="userNameAutocomplete" class="autocomplete-items"></div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label for="interventionType">Type d'intervention :</label>
+                <select id="interventionType" required>
+                    <option value="">Sélectionner</option>
+                    <option value="remote">À distance</option>
+                    <option value="onsite">Sur place</option>
+                    <option value="both">Les deux</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="priority">Priorité :</label>
+                <select id="priority" required>
+                    <option value="">Sélectionner</option>
+                    <option value="1">1 - Haute</option>
+                    <option value="2">2 - Moyenne</option>
+                    <option value="3">3 - Basse</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label for="missionType">Type de mission :</label>
+                <select id="missionType" required>
+                    <option value="">Sélectionner un type</option>
+                    <option value="support">Support/Assistance</option>
+                    <option value="maintenance">Maintenance Matérielle</option>
+                    <option value="network">Réseau & Configuration</option>
+                    <option value="software">Logiciels & Mises à jour</option>
+                    <option value="security">System/Sécurité/Sauvegarde</option>
+                    <option value="microsoft">Applications divers & Microsoft</option>
+                    <option value="printing">Impression</option>
+                    <option value="equipment">Équipements</option>
+                    <option value="purchase">Achat</option>
+                    <option value="training">Formation/Sensibilisation</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="missionDetail">Détail mission :</label>
+                <select id="missionDetail" required disabled>
+                    <option value="">Choisir d'abord le type</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="missionDescription">Description / Notes :</label>
+            <textarea id="missionDescription" rows="3"></textarea>
+        </div>
+        
+        <button id="addButton">Ajouter la mission</button>
+    </div>
+
+    <div class="export-container">
+        <button id="exportButton">Exporter CSV</button>
+        <button id="clearArchives">Vider Archives</button>
+        <button id="clearStorage" style="background-color: #660000;">Reset Total</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addButton = document.getElementById('addButton');
+            const recordsList = document.getElementById('recordsList');
+            const topMissionsGrid = document.getElementById('topMissionsGrid');
+            const userNameInput = document.getElementById('userName');
+            const autocompleteContainer = document.getElementById('userNameAutocomplete');
+            const missionTypeSelect = document.getElementById('missionType');
+            const missionDetailSelect = document.getElementById('missionDetail');
+            
+            let records = [];
+            let currentlyEditingId = null;
+
+            const users = [
+                "Abdelkader BenHammouda", "Abderazak Houssaini", "Afef Karaani", "Ahlem Abdrabbou", 
+                "Ahlem Belgacem", "Ahlem Khmissi", "Ahmed Abdelatif", "Aicha Benromdhane", 
+                "Ali Touzri", "Alia Bensalah", "Amani Kassab", "Amel Chaaben", "Amel Ghodhban", 
+                "Amel Nasr", "Amira Chaieb", "Anis Khiari", "Asma Bouslah", "Awatef Arfaoui", 
+                "Aziza Abaza", "Azza Hrigua", "Basma Tlili", "Belgessem Khalil", "Besma Ghrairi", 
+                "Bouchra Boujemaa", "Bououd Jamila", "Chadia Chaabani", "Chadia Fares", 
+                "Chafiaa Tayari", "Chiraz Ouislati", "Chokri Elgharbi", "Chokri Othmani", 
+                "Dalila Cherni", "Ebtihel Guarbouj", "Emira Dhaouadi", "Emna Kasdalah", 
+                "Faiza Jridi", "Faouzia Daghfous", "Fathi Boudhiba", "Fathia Hammami", 
+                "Fathia Zarrouk", "Fatma Dalhem", "Fatma Mejri", "Oussama Abid", "Hatem Salhi",
+                "Faycel Bensalah", "Habiba Ben Ahmed", "Hadhami Belhadjamor", "Hajer Najar", 
+                "Hajer Obbi", "Hamadi Benchaabane", "Hamadi Khefifi", "Hamida Tayari", 
+                "Hana Massoudi", "Hanan Jlassi", "Hanen Kaabar", "Plusieurs Users"
+            ].sort();
+
+            const missionTypes = {
+                support: "Support/Assistance", maintenance: "Maintenance Matérielle",
+                network: "Réseau & Configuration", software: "Logiciels & Mises à jour",
+                security: "Sécurité", microsoft: "Applications", printing: "Impression",
+                equipment: "Équipements", purchase: "Achat", training: "Formation"
+            };
+            
+            const missionDetails = {
+                support: ["Helpdesk", "Assistance", "Dépannage"],
+                maintenance: ["Disque dur", "RAM", "Maintenance Externe"],
+                network: ["Config Réseau", "ADSL HS", "Connexion"],
+                software: ["Installation", "Licence", "Mise à jour"],
+                security: ["Sauvegarde", "Identifiants"],
+                microsoft: ["Office", "OneDrive", "Elise", "Amen"],
+                printing: ["Problème impression", "Pilotes"],
+                equipment: ["Fourniture", "Entrée/Sortie", "Installation"],
+                purchase: ["Commande", "Livraison"],
+                training: ["Atelier", "Formation"]
+            };
+
+            if(localStorage.getItem('missionRecords')) {
+                records = JSON.parse(localStorage.getItem('missionRecords'));
+                renderRecords();
+            }
+
+            // --- LOGIQUE D'AFFICHAGE ---
+            function createRecordHTML(record, isGridMode = false) {
+                const priorityClass = `priority-${record.priority === 1 ? 'high' : record.priority === 2 ? 'medium' : 'low'}`;
+                const interventionClass = `intervention-${record.interventionType}`;
+                const isEditing = currentlyEditingId === record.id;
+                
+                return `
+                    <div class="record-item ${interventionClass}" data-id="${record.id}">
+                        <div class="mission-details">
+                            <span class="collaborator-name"><strong>${record.userName.toUpperCase()}</strong></span><br>
+                            <small>${record.missionTypeLabel}</small>
+                            <div class="problem-details">${record.missionDetail}</div>
+                            ${isEditing ? `<textarea class="edit-description">${record.description || ''}</textarea>` : 
+                            (record.description ? `<div class="description">${record.description}</div>` : '')}
+                        </div>
+                        <div class="mission-actions">
+                            <div class="priority-controls">
+                                <div class="priority-value ${priorityClass}">P${record.priority}</div>
+                            </div>
+                            ${isEditing ? `<button class="edit-btn" onclick="saveEdit(${record.id})">OK</button>` : 
+                            `<button class="edit-btn" onclick="startEdit(${record.id})">📝</button>`}
+                            <button class="archive-btn" onclick="archiveRecord(${record.id})">✔</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderRecords() {
+                const activeRecords = records.filter(record => !record.archived);
+                activeRecords.sort((a, b) => a.priority - b.priority || b.id - a.id);
+
+                // Séparation Top 5 et Reste
+                const top5 = activeRecords.slice(0, 5);
+                const rest = activeRecords.slice(5);
+
+                // Remplissage du Grid (Haut)
+                topMissionsGrid.innerHTML = top5.map(r => createRecordHTML(r, true)).join('');
+                
+                // Remplissage de la Colonne (Centre)
+                if(rest.length === 0 && top5.length === 0) {
+                    recordsList.innerHTML = '<p>Aucune mission en cours.</p>';
+                } else {
+                    recordsList.innerHTML = rest.map(r => createRecordHTML(r, false)).join('');
+                }
+            }
+
+            // --- FORMULAIRE ET ACTIONS (Identiques à votre code original) ---
+            
+            missionTypeSelect.addEventListener('change', function() {
+                const selectedType = this.value;
+                missionDetailSelect.innerHTML = '';
+                if (!selectedType) {
+                    missionDetailSelect.disabled = true;
+                    return;
+                }
+                missionDetailSelect.disabled = false;
+                missionDetailSelect.innerHTML = '<option value="">Sélectionnez un détail</option>';
+                missionDetails[selectedType].forEach(detail => {
+                    const option = document.createElement('option');
+                    option.value = detail; option.textContent = detail;
+                    missionDetailSelect.appendChild(option);
+                });
+            });
+
+            addButton.addEventListener('click', function() {
+                const userName = userNameInput.value.trim();
+                const priority = document.getElementById('priority').value;
+                const type = document.getElementById('missionType').value;
+                const detail = document.getElementById('missionDetail').value;
+
+                if(userName && priority && type && detail) {
+                    const newRecord = {
+                        id: Date.now(),
+                        userName: userName,
+                        interventionType: document.getElementById('interventionType').value,
+                        missionType: type,
+                        missionTypeLabel: missionTypes[type],
+                        missionDetail: detail,
+                        description: document.getElementById('missionDescription').value,
+                        priority: parseInt(priority),
+                        date: new Date().toLocaleString('fr-FR'),
+                        archived: false
+                    };
+                    records.push(newRecord);
+                    localStorage.setItem('missionRecords', JSON.stringify(records));
+                    renderRecords();
+                    // Reset
+                    userNameInput.value = '';
+                    document.getElementById('missionDescription').value = '';
+                } else { alert('Champs obligatoires manquants'); }
+            });
+
+            // Autocomplétion simplifiée
+            userNameInput.addEventListener('input', function() {
+                const val = this.value.toLowerCase();
+                autocompleteContainer.innerHTML = '';
+                if (!val) return;
+                users.filter(u => u.toLowerCase().includes(val)).slice(0, 5).forEach(u => {
+                    const d = document.createElement('div');
+                    d.textContent = u;
+                    d.onclick = () => { userNameInput.value = u; autocompleteContainer.innerHTML = ''; };
+                    autocompleteContainer.appendChild(d);
+                });
+            });
+
+            // Fonctions Window pour les boutons
+            window.archiveRecord = (id) => {
+                const r = records.find(x => x.id === id);
+                if(r) { r.archived = true; localStorage.setItem('missionRecords', JSON.stringify(records)); renderRecords(); }
+            };
+            window.startEdit = (id) => { currentlyEditingId = id; renderRecords(); };
+            window.saveEdit = (id) => {
+                const r = records.find(x => x.id === id);
+                const txt = document.querySelector(`[data-id="${id}"] .edit-description`);
+                if(r && txt) { r.description = txt.value; currentlyEditingId = null; localStorage.setItem('missionRecords', JSON.stringify(records)); renderRecords(); }
+            };
+
+            // Exports et Clean
+            document.getElementById('clearArchives').onclick = () => {
+                records = records.filter(r => !r.archived);
+                localStorage.setItem('missionRecords', JSON.stringify(records));
+                renderRecords();
+            };
+            document.getElementById('clearStorage').onclick = () => {
+                if(confirm("Tout supprimer ?")) { localStorage.clear(); records = []; renderRecords(); }
+            };
+        });
+    </script>
+</body>
+</html>
