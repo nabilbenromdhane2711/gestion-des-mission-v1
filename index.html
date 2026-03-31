@@ -1,3 +1,7 @@
++412
+Lines changed: 412 additions & 0 deletions
+Original file line number	Diff line number	Diff line change
+@@ -1 +1,413 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -20,12 +24,10 @@
             gap: 10px;
             margin-bottom: 30px;
         }
-
         .main-column {
             max-width: 800px;
             margin: 0 auto 30px auto;
         }
-
         /* Styles des cartes en haut */
         .top-priority-grid .record-item {
             flex-direction: column;
@@ -36,14 +38,12 @@
             border-top: 5px solid;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
         .top-priority-grid .mission-actions {
             flex-direction: row;
             justify-content: center;
             margin-top: 10px;
             width: 100%;
         }
-
         /* --- STYLES EXISTANTS MODIFIÉS --- */
         .form-container {
             background-color: #ffffff;
@@ -52,18 +52,15 @@
             margin-top: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
         .form-group {
             margin-bottom: 15px;
             position: relative;
         }
-
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-
         input, select, textarea {
             width: 100%;
             padding: 8px;
@@ -71,7 +68,6 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
-
         button {
             padding: 10px 15px;
             border: none;
@@ -79,17 +75,14 @@
             cursor: pointer;
             font-size: 14px;
         }
-
         #addButton {
             background-color: #4CAF50;
             color: white;
             width: 100%;
             font-weight: bold;
         }
-
         .archive-btn { background-color: #f44336; color: white; }
         .edit-btn { background-color: #2196F3; color: white; }
-
         .record-item {
             display: flex;
             justify-content: space-between;
@@ -100,16 +93,13 @@
             border-radius: 4px;
             margin-bottom: 5px;
         }
-
         .priority-high { color: red; font-weight: bold; }
         .priority-medium { color: orange; }
         .priority-low { color: green; }
-
         /* Couleurs bordures */
         .intervention-remote { border-left: 5px solid #2196F3; }
         .intervention-onsite { border-left: 5px solid #4CAF50; }
         .intervention-both { border-left: 5px solid #9c27b0; }
-
         .mission-details { flex-grow: 1; }
         .mission-actions { display: flex; gap: 8px; align-items: center; }
         .problem-details { font-style: italic; color: #555; margin: 3px 0; }
@@ -120,10 +110,8 @@
             font-size: 13px; 
             border-radius: 3px;
         }
-
         .priority-controls { display: flex; align-items: center; gap: 5px; }
         .priority-btn { padding: 2px 5px; background: #eee; }
-
         .autocomplete-items {
             position: absolute;
             border: 1px solid #d4d4d4;
@@ -132,7 +120,6 @@
             background: white;
         }
         .autocomplete-items div { padding: 10px; cursor: pointer; border-bottom: 1px solid #d4d4d4; }
-
         .export-container {
             margin-top: 40px;
             display: flex;
@@ -142,21 +129,17 @@
     </style>
 </head>
 <body>
-
     <h1>Tableau de bord des missions</h1>
-
     <div id="topMissionsSection">
         <h2>🔥 Top 5 Priorités</h2>
         <div id="topMissionsGrid" class="top-priority-grid">
             </div>
     </div>
-
     <div class="main-column">
         <h2>Liste des missions</h2>
         <div id="recordsList">
             </div>
     </div>
-
     <div class="form-container">
         <h2>Nouvelle Mission</h2>
         <div class="form-group">
@@ -186,7 +169,6 @@
                 </select>
             </div>
         </div>
-
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             <div class="form-group">
                 <label for="missionType">Type de mission :</label>
@@ -212,7 +194,6 @@
                 </select>
             </div>
         </div>
-
         <div class="form-group">
             <label for="missionDescription">Description / Notes :</label>
             <textarea id="missionDescription" rows="3"></textarea>
@@ -220,13 +201,11 @@
         
         <button id="addButton">Ajouter la mission</button>
     </div>
-
     <div class="export-container">
         <button id="exportButton">Exporter CSV</button>
         <button id="clearArchives">Vider Archives</button>
         <button id="clearStorage" style="background-color: #660000;">Reset Total</button>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const addButton = document.getElementById('addButton');
@@ -239,40 +218,21 @@
             
             let records = [];
             let currentlyEditingId = null;
-
             const users = [
                 "Abdelkader BenHammouda", "Abderazak Houssaini", "Afef Karaani", "Ahlem Abdrabbou", 
-                "Abdelkader Ben Hammouda", "Abderazak Houssaini", "Afef Karaani", "Ahlem Abdrabbou",
-                "Ahlem Belgacem", "Ahlem Khmissi", "Ahmed Abdelatif", "Aicha Benromdhane", "Ali Touzri",
-                "Alia Bensalah", "Amani Kassab", "Amel Chaaben", "Amel Ghodhban", "Amel Nasr", "Amira Chaieb",
-                "Anis Khiari", "Asma Bouslah", "najeh bensaad" ,"Awatef Arfaoui", "Aziza Abaza", "Azza Hriga",
-                "Baligh Hamdi Trabelsi", "Basma Tlili", "Belgessem Khalil", "Besma Ghrairi", "Bouchra Boujemaa",
-                "Bououd Jamila", "Chadia Chaabani", "Chadia Fares", "Chafiaa Tayari", "Chiraz Ouislati",
-                "Chokri Elgharbi", "Chokri Othmani", "Dalila Cherni", "Ebtihel Guarbouj", "Emira Dhaouadi",
-                "Emna Kasdalah", "Faiza Jridi", "Faouzia Daghfous", "Fathi Boudhiba", "Fathia Hammami",
-                "Fathia Zarrouk", "Fatma Dalhem", "Fatma Mejri", "Faycel Bensalah", "Habiba Ben Ahmed",
-                "Hadhami Belhadjamor", "Hajer Najar", "Hajer Obbi", "Hamadi Benchaabane", "Hamadi Khefifi",
-                "Hamida Tayari", "Hana Massoudi", "Hanan Jlassi", "Hanan Benalhadj", "Hanen Benrhaiem",
-                "Hanen Kaabar", "Hatem Karim", "Hayet Sghaier", "Hbib Jbeli", "Hbib Swihi", "Henda Naouara",
-                "Henda Belarbi", "Henda Ounaissa", "Houda Khmir", "Imed Solaani", "Imen Zayani", "Imen Awedi",
-                "Imen Chabbouh", "Imen Jazi", "Imen Sboui", "Ines Sghaier", "Intissar Tarhouni",
-                "Intissar Benkhlifa", "Jalila Rahali", "Jamel Mhadhbi", "Jameledin Esghayer", 
-                "Jamila Bennasri", "Kalthoum Lbahri", "Karima Ferjani", "Khedija Gharsalli", "Khmaies Bouothman",
-                "Kilani Benmabrouk", "Lamia Bengamra", "Lamya Majri", "Latifa Mokhtar", "Latrach Sonia",
-                "Lilia Eljbali", "Lotfi Chaabani", "Lotfi Chouikha", "Maha Chemengui", "Maha Nefla",
-                "Mahmoud Benhamda", "Majda Mansour", "Marwa Khalil", "Medb Basma", "Meriam Ferjani", "Moez Mami",
-                "Mohamed Dababi", "Mohamed Kassabi", "Mohamed Salima", "Mohamed Belhadjali", "Mohamed Benabdellah",
-                "Mohamed Boudkim", "Mohamed Saadi", "Mohamedmehdi Limam", "Mohamedsalah Charchari", "Monia Hammami",
-                "Monkedh Belhajrhouma", "Mouaouia Mhamdi", "Moufida Elhamdi", "Mouna Bmabrouk", "Mouna Jaraya",
-                "Mouna Abidi", "Mouna Benhassoun", "Mounira Marzouk", "Mounira Saadaoui", "Mourad Elaamouri",
-                "Nabiha Benakil", "Nabil Benromdhane", "Nabila Berbouch", "Nabila Boukadida", "Nafaa Chtiba",
-                "Najeh Meddeb", "Najet Abdia", "Najet Emhamed", "Najoua Merdassi", "Najwa Bensalha", "Najwa Filani",
-                "Naziha Chtioui", "Naziha Mhadhbi", "Nedra Jabnoun", "Nooman Ben Hamada", "Noujoud Benamara",
-                "Noura Gharsillaoui", "Nouria Mrabet", "Olfa Benhassine", "Rabeb Medeb", "Radhouane Hammami", "Raja Bahroun", "Raja Etoumi", "Ramzi Mathlouthi", "Riadh Trabellsi", "Riahi Ahlem", "Ridha Ayari", "Rihab Belhadjali", "Rihab Nafati", "Rim Harkafi", "Rim Medeb", "Sabah Rhimi", "Sabria Kharbech", "Salma Talmoudi", "Salwa Belhadjmabrouk", "Salwa Bennsib", "Salwa Hawri", "Samah Barboura", "Samah Bhajjla", "Samah Bouchouicha", "Samah Jouini", "Sameh Bahri", "Sameh Elaabdia", "Sameh Trabelssi", "Sami Jaziri", "Samia Bensalha", "Samira Zayadi", "Sana Benammar", "Sana Bengharbia", "Sana Zouari", "Sarra Benamor", "Sondes Majdoub", "Sonia Elaid", "Souhaila Rahouaj", "Soumaya Frouja", "Taief Zammel", "Takwa Turki", "Talel Ghozzi", "Taoufik Sahli", "Tarek Elasfour", "Teheni Fehri", "Thouraya Najar", "Tmayem Benkhedher", "Wafa Gobbar", "Walid Helel", "Wided Bendewed", "Yamina Bihaouiya",
-                "Yosra Bellalouna", "Zohra Benhouia", "Zohra Bouaouina", "Zoubeir Sassi", "Zouheir Amri", "Zouhour Jazi"
+                "Ahlem Belgacem", "Ahlem Khmissi", "Ahmed Abdelatif", "Aicha Benromdhane", 
+                "Ali Touzri", "Alia Bensalah", "Amani Kassab", "Amel Chaaben", "Amel Ghodhban", 
+                "Amel Nasr", "Amira Chaieb", "Anis Khiari", "Asma Bouslah", "Awatef Arfaoui", 
+                "Aziza Abaza", "Azza Hrigua", "Basma Tlili", "Belgessem Khalil", "Besma Ghrairi", 
+                "Bouchra Boujemaa", "Bououd Jamila", "Chadia Chaabani", "Chadia Fares", 
+                "Chafiaa Tayari", "Chiraz Ouislati", "Chokri Elgharbi", "Chokri Othmani", 
+                "Dalila Cherni", "Ebtihel Guarbouj", "Emira Dhaouadi", "Emna Kasdalah", 
+                "Faiza Jridi", "Faouzia Daghfous", "Fathi Boudhiba", "Fathia Hammami", 
+                "Fathia Zarrouk", "Fatma Dalhem", "Fatma Mejri", "Oussama Abid", "Hatem Salhi",
+                "Faycel Bensalah", "Habiba Ben Ahmed", "Hadhami Belhadjamor", "Hajer Najar", 
+                "Hajer Obbi", "Hamadi Benchaabane", "Hamadi Khefifi", "Hamida Tayari", 
                 "Hana Massoudi", "Hanan Jlassi", "Hanen Kaabar", "Plusieurs Users"
             ].sort();
-
             const missionTypes = {
                 support: "Support/Assistance", maintenance: "Maintenance Matérielle",
                 network: "Réseau & Configuration", software: "Logiciels & Mises à jour",
@@ -292,12 +252,10 @@
                 purchase: ["Commande", "Livraison"],
                 training: ["Atelier", "Formation"]
             };
-
             if(localStorage.getItem('missionRecords')) {
                 records = JSON.parse(localStorage.getItem('missionRecords'));
                 renderRecords();
             }
-
             // --- LOGIQUE D'AFFICHAGE ---
             function createRecordHTML(record, isGridMode = false) {
                 const priorityClass = `priority-${record.priority === 1 ? 'high' : record.priority === 2 ? 'medium' : 'low'}`;
@@ -324,15 +282,12 @@
                     </div>
                 `;
             }
-
             function renderRecords() {
                 const activeRecords = records.filter(record => !record.archived);
                 activeRecords.sort((a, b) => a.priority - b.priority || b.id - a.id);
-
                 // Séparation Top 5 et Reste
                 const top5 = activeRecords.slice(0, 5);
                 const rest = activeRecords.slice(5);
-
                 // Remplissage du Grid (Haut)
                 topMissionsGrid.innerHTML = top5.map(r => createRecordHTML(r, true)).join('');
                 
@@ -343,7 +298,6 @@
                     recordsList.innerHTML = rest.map(r => createRecordHTML(r, false)).join('');
                 }
             }
-
             // --- FORMULAIRE ET ACTIONS (Identiques à votre code original) ---
             
             missionTypeSelect.addEventListener('change', function() {
@@ -361,13 +315,11 @@
                     missionDetailSelect.appendChild(option);
                 });
             });
-
             addButton.addEventListener('click', function() {
                 const userName = userNameInput.value.trim();
                 const priority = document.getElementById('priority').value;
                 const type = document.getElementById('missionType').value;
                 const detail = document.getElementById('missionDetail').value;
-
                 if(userName && priority && type && detail) {
                     const newRecord = {
                         id: Date.now(),
@@ -389,7 +341,6 @@
                     document.getElementById('missionDescription').value = '';
                 } else { alert('Champs obligatoires manquants'); }
             });
-
             // Autocomplétion simplifiée
             userNameInput.addEventListener('input', function() {
                 const val = this.value.toLowerCase();
@@ -402,7 +353,6 @@
                     autocompleteContainer.appendChild(d);
                 });
             });
-
             // Fonctions Window pour les boutons
             window.archiveRecord = (id) => {
                 const r = records.find(x => x.id === id);
@@ -414,7 +364,6 @@
                 const txt = document.querySelector(`[data-id="${id}"] .edit-description`);
                 if(r && txt) { r.description = txt.value; currentlyEditingId = null; localStorage.setItem('missionRecords', JSON.stringify(records)); renderRecords(); }
             };
-
             // Exports et Clean
             document.getElementById('clearArchives').onclick = () => {
                 records = records.filter(r => !r.archived);
